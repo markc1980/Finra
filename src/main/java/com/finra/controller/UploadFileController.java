@@ -1,12 +1,14 @@
 package com.finra.controller;
 
 import com.finra.dto.FileMetaDataDto;
+import com.finra.service.FileService;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,15 +24,16 @@ import java.io.OutputStream;
  * Created by markchin on 8/29/17.
  */
 @RestController
-public class FileUploadController {
+public class UploadFileController {
+
+    @Autowired
+    private FileService fileService;
 
     @PostMapping("/uploadFile")
     public void uploadFile(@RequestPart("file") MultipartFile multipartFile,
                            @RequestPart("fileMetaData")FileMetaDataDto fileMetaDataDto){
         try {
-            System.out.println("File Meta Data "+fileMetaDataDto);
-            IOUtils.copyLarge(multipartFile.getInputStream(), new FileOutputStream(new File(multipartFile.getOriginalFilename())));
-            System.out.println("In here");
+            fileService.saveFile(fileMetaDataDto, multipartFile.getInputStream());
         }catch(Exception e){
 
         }
