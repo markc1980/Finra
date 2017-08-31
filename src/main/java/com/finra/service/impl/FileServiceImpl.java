@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -64,7 +65,7 @@ public class FileServiceImpl implements FileService{
 
             FileMetaData fileMetaData = new FileMetaData(
                     multipart.getOriginalFilename(), multipart.getSize(),
-                    new java.sql.Date(new Date().getTime()),
+                    new Timestamp(new Date().getTime()),
                     fileLocation, fileMetaDataDto.getOwner(), checkSum );
             fileRepo.save(fileMetaData);
 
