@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * Created by mchin on 8/30/2017.
@@ -32,7 +33,7 @@ public class FileMetaData {
     private Long fileSize;
 
     @Column(name="UPLOAD_DATE", nullable = false)
-    private Date uploadDate;
+    private Timestamp uploadDate;
 
     @Column(name="FILE_LOCATION", nullable = false)
     private String fileLocation;
@@ -43,7 +44,7 @@ public class FileMetaData {
     @Column(name="CHECK_SUM", nullable = false)
     private String checksum;
 
-    public FileMetaData(String fileName, Long fileSize, Date uploadDate, String fileLocation, String owner,String checksum) {
+    public FileMetaData(String fileName, Long fileSize, Timestamp uploadDate, String fileLocation, String owner,String checksum) {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.uploadDate = uploadDate;
@@ -76,11 +77,11 @@ public class FileMetaData {
         this.fileSize = fileSize;
     }
 
-    public Date getUploadDate() {
+    public Timestamp getUploadDate() {
         return uploadDate;
     }
 
-    public void setUploadDate(Date uploadDate) {
+    public void setUploadDate(Timestamp uploadDate) {
         this.uploadDate = uploadDate;
     }
 

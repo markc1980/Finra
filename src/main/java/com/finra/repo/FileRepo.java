@@ -17,4 +17,6 @@ public interface FileRepo extends CrudRepository<FileMetaData, String> {
 
 
     Page<FileMetaData> findByFileNameContainingAndOwnerAndUploadDateBetween(String fileName, String owner, Date startDate, Date endDate, Pageable pageable);
+
+    List<FileMetaData> findByUploadDateAfter(Date time);
 }

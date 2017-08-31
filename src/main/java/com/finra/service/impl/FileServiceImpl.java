@@ -40,10 +40,8 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public String saveFileData(FileMetaDataDto fileMetaDataDto, MultipartFile multipart) {
-        FileMetaData fileMetaData = null;
-
-        byte[] buffer = new byte[1024 * 8];
         try {
+            byte[] buffer = new byte[1024 * 8];
             final InputStream is = multipart.getInputStream();
             final OutputStream os = new FileOutputStream(
                     new File(fileLocation, multipart.getOriginalFilename()));
@@ -64,19 +62,16 @@ public class FileServiceImpl implements FileService{
             final String checkSum = DatatypeConverter.printHexBinary(md.digest());
             System.out.println("DatatypeConverter.printHexBinary(md.digest()) = "+ checkSum);
 
-            fileMetaData = new FileMetaData(
+            FileMetaData fileMetaData = new FileMetaData(
                     multipart.getOriginalFilename(), multipart.getSize(),
                     new java.sql.Date(new Date().getTime()),
                     fileLocation, fileMetaDataDto.getOwner(), checkSum );
             fileRepo.save(fileMetaData);
 
-
+            return fileMetaData.getId();
         }catch(Exception e){
             throw new RuntimeException(e);
         }
-
-        return null;
-
     }
 
     @Override
@@ -92,15 +87,6 @@ public class FileServiceImpl implements FileService{
     @Override
     public Page<FileMetaData> searchFiles(String fileName, String owner, Date startDate, Date endDate, Pageable pageable) {
         return fileRepo.findByFileNameContainingAndOwnerAndUploadDateBetween(fileName, owner.toUpperCase(), startDate, endDate,pageable);
-        //        Criteria criteriaCount = session.createCriteria(FileMetaData.class);
-//        criteriaCount.setProjection(Projections.rowCount());
-//        Long count = (Long) criteriaCount.uniqueResult();
-//
-//        Criteria criteria = session.createCriteria(FileMetaData.class);
-//        criteria.setFirstResult(0);
-//        criteria.setMaxResults(2);
-//        List<FileMetaData> firstPage = criteria.list();
-
     }
 
     @Override
