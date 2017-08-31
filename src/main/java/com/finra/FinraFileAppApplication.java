@@ -6,8 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 @ComponentScan
 @EnableAutoConfiguration
@@ -23,8 +25,18 @@ public class FinraFileAppApplication {
 	@Bean
 	public CommonsMultipartResolver multipartResolver() {
 		final CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+		commonsMultipartResolver.setMaxUploadSize(-1);
 		return commonsMultipartResolver;
 	}
+
+	@Bean
+	@Order(0)
+	public MultipartFilter multipartFilter() {
+		MultipartFilter multipartFilter = new MultipartFilter();
+		multipartFilter.setMultipartResolverBeanName("multipartResolver");
+		return multipartFilter;
+	}
+
 
 
 }

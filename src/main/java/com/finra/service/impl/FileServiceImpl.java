@@ -38,20 +38,31 @@ public class FileServiceImpl implements FileService{
     @Override
     public String saveFileData(FileMetaDataDto fileMetaDataDto, MultipartFile multipart) {
         FileMetaData fileMetaData = null;
+        InputStream is = null;
+        OutputStream os = null;
+
         try {
+            is = multipart.getInputStream();
+            String checksum = DigestUtils.md5Hex(is);
+            System.out.println("Checksum "+checksum);
+            os = new FileOutputStream(
+                    new File(fileLocation, multipart.getOriginalFilename()));
+            long bytes = IOUtils.copyLarge(is, os);
+            System.out.println("bytes written "+bytes);
 
-            IOUtils.copyLarge(multipart.getInputStream(), new FileOutputStream(
-                    new File(fileLocation, multipart.getOriginalFilename())));
 
-            String checksum = DigestUtils.md5Hex(multipart.getInputStream());
-            fileMetaData = new FileMetaData(
-                    multipart.getOriginalFilename(), multipart.getSize(),
-                    new java.sql.Date(new Date().getTime()),
-                    fileLocation, checksum );
-            fileRepo.save(fileMetaData);
-            return fileMetaData.getId();
+//            fileMetaData = new FileMetaData(
+//                    multipart.getOriginalFilename(), multipart.getSize(),
+//                    new java.sql.Date(new Date().getTime()),
+//                    fileLocation, checksum );
+//            fileRepo.save(fileMetaData);
+            return null;
         }catch(Exception e){
             throw new RuntimeException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(is);
+            IOUtils.closeQuietly(os);
         }
     }
 

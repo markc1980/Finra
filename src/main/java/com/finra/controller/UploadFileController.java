@@ -34,7 +34,7 @@ public class UploadFileController {
         try {
             fileService.saveFileData(fileMetaDataDto, multipartFile);
         }catch(Exception e){
-
+            throw new RuntimeException(e);
         }
     }
 

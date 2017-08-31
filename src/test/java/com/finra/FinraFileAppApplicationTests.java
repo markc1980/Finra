@@ -43,7 +43,7 @@ public class FinraFileAppApplicationTests {
 		jo.put("permissions", "R");
 
 		builder.addTextBody("fileMetaData",jo.toString(), ContentType.APPLICATION_JSON);
-		builder.addBinaryBody("file", new File("/Users/markchin/Desktop/insanity.avi"),
+		builder.addBinaryBody("file", new File("/Users/markchin/Desktop/b1request.xml"),
 				ContentType.APPLICATION_OCTET_STREAM, "insanity.ext");
 
 
