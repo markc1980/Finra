@@ -1,8 +1,10 @@
 package com.finra;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.HttpEntityWrapper;
@@ -17,20 +19,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 
 public class FinraFileAppApplicationTests {
 
-	@Test
-	public void contextLoads() {
 
-	}
 
 	@Test
-	public void whenSendMultipartRequestUsingHttpClient_thenCorrect()
+	public void upload()
 			throws ClientProtocolException, IOException, JSONException {
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost("http://localhost:8080/uploadFile");
@@ -61,6 +62,17 @@ public class FinraFileAppApplicationTests {
 
 		CloseableHttpResponse response = client.execute(httpPost);
 		client.close();
+	}
+
+	@Test
+	public void download() throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://localhost:8080/downloadFile");
+		CloseableHttpResponse response = client.execute(httpGet);
+		InputStream is  = response.getEntity().getContent();
+
+		IOUtils.copy(is, new FileOutputStream(new File("myFile.txt")));
+
 	}
 
 
