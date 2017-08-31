@@ -18,5 +18,7 @@ public interface FileService {
 
     void downloadFileData(String fileId, OutputStream os);
 
-    Page<FileMetaData> searchFiles(String fileName, Date startDate, Date endDate, Pageable pageable);
+    Page<FileMetaData> searchFiles(String fileName, String owner, Date startDate, Date endDate, Pageable pageable);
+
+    FileMetaData getMetaData(String fileId);
 }

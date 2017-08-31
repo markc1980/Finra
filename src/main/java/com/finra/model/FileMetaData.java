@@ -12,9 +12,12 @@ import java.sql.Date;
 @Table(name = "FILE_META_DATA",
         indexes = {@Index(name = "FILE_NAME_IDX",  columnList="FILE_NAME", unique = false),
                 @Index(name = "UPLOAD_DATE_IDX", columnList="UPLOAD_DATE",     unique = false),
-                @Index(name = "FILE_NAME_UPLOAD_DATE_IDX", columnList="FILE_NAME, UPLOAD_DATE",     unique = false),
+                @Index(name = "FILE_NAME_OWNER_UPLOAD_DATE_IDX", columnList="FILE_NAME, OWNER, UPLOAD_DATE",     unique = false),
         })
 public class FileMetaData {
+
+    public FileMetaData() {
+    }
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -34,17 +37,19 @@ public class FileMetaData {
     @Column(name="FILE_LOCATION", nullable = false)
     private String fileLocation;
 
+    @Column(name="OWNER", nullable = false)
+    private String owner;
+
     @Column(name="CHECK_SUM", nullable = false)
     private String checksum;
 
-
-
-    public FileMetaData(String fileName, Long fileSize, Date uploadDate, String fileLocation, String checksum) {
+    public FileMetaData(String fileName, Long fileSize, Date uploadDate, String fileLocation, String owner,String checksum) {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.uploadDate = uploadDate;
         this.fileLocation = fileLocation;
         this.checksum = checksum;
+        this.owner = owner.toUpperCase();
     }
 
     public String getId() {
@@ -95,5 +100,11 @@ public class FileMetaData {
         this.checksum = checksum;
     }
 
+    public String getOwner() {
+        return owner;
+    }
 
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 }
