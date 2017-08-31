@@ -1,6 +1,7 @@
 package com.finra;
 
 import com.finra.dto.FileMetaDataDto;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -19,12 +20,16 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 
 
 public class FinraFileAppApplicationTests {
@@ -43,8 +48,9 @@ public class FinraFileAppApplicationTests {
 		jo.put("permissions", "R");
 
 		builder.addTextBody("fileMetaData",jo.toString(), ContentType.APPLICATION_JSON);
-		builder.addBinaryBody("file", new File("/Users/markchin/Desktop/b1request.xml"),
-				ContentType.APPLICATION_OCTET_STREAM, "insanity.ext");
+		//builder.addBinaryBody("file", new File("/Users/markchin/Desktop/b1request.xml"),
+		builder.addBinaryBody("file", new File("C:\\Users\\mchin\\ports.txt"),
+				ContentType.APPLICATION_OCTET_STREAM, "ports.txt");
 
 
 		ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
@@ -129,4 +135,24 @@ public class FinraFileAppApplicationTests {
 
 		}
 	}
+
+	@Test
+	public void testDigest() throws Exception{
+		byte[] buffer = new byte[8192];
+		FileInputStream fis = new FileInputStream(new File("C:\\Users\\mchin\\ports.txt"));
+//		String checksum = DigestUtils.md5Hex(fis);
+//		System.out.println("Digest = "+checksum);
+
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		DigestInputStream dis = new DigestInputStream(fis, md);
+		try {
+			byte buf[]=new byte[8 * 1024];
+			while (dis.read(buf,0,buf.length) > 0)     ;
+		} finally {
+			dis.close();
+		}
+		System.out.println("DatatypeConverter.printHexBinary(md.digest()) = "+ DatatypeConverter.printHexBinary(md.digest()));
+	}
+
+
 }

@@ -4,7 +4,6 @@ import com.finra.dto.FileMetaDataDto;
 import com.finra.model.FileMetaData;
 import com.finra.repo.FileRepo;
 import com.finra.service.FileService;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,12 +13,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -29,6 +32,7 @@ import java.util.Date;
 @Transactional
 public class FileServiceImpl implements FileService{
 
+    private static final int EOF = -1;
     @Autowired
     private FileRepo fileRepo;
 
@@ -37,32 +41,37 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public String saveFileData(FileMetaDataDto fileMetaDataDto, MultipartFile multipart) {
-        FileMetaData fileMetaData = null;
-        InputStream is = null;
-        OutputStream os = null;
-
         try {
-            is = multipart.getInputStream();
-            String checksum = DigestUtils.md5Hex(is);
-            System.out.println("Checksum "+checksum);
-            os = new FileOutputStream(
+            byte[] buffer = new byte[1024 * 8];
+            final InputStream is = multipart.getInputStream();
+            final OutputStream os = new FileOutputStream(
                     new File(fileLocation, multipart.getOriginalFilename()));
-            long bytes = IOUtils.copyLarge(is, os);
-            System.out.println("bytes written "+bytes);
 
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            DigestInputStream dis = new DigestInputStream(is, md);
+            try {
+                int n;
+                while (EOF != (n = dis.read(buffer))) {
+                    os.write(buffer, 0, n);
+                }
+            } finally {
+                IOUtils.closeQuietly(dis);
+                IOUtils.closeQuietly(is);
+                IOUtils.closeQuietly(os);
+            }
 
-//            fileMetaData = new FileMetaData(
-//                    multipart.getOriginalFilename(), multipart.getSize(),
-//                    new java.sql.Date(new Date().getTime()),
-//                    fileLocation, checksum );
-//            fileRepo.save(fileMetaData);
-            return null;
+            final String checkSum = DatatypeConverter.printHexBinary(md.digest());
+            System.out.println("DatatypeConverter.printHexBinary(md.digest()) = "+ checkSum);
+
+            FileMetaData fileMetaData = new FileMetaData(
+                    multipart.getOriginalFilename(), multipart.getSize(),
+                    new Timestamp(new Date().getTime()),
+                    fileLocation, fileMetaDataDto.getOwner(), checkSum );
+            fileRepo.save(fileMetaData);
+
+            return fileMetaData.getId();
         }catch(Exception e){
             throw new RuntimeException(e);
-        }
-        finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
         }
     }
 
@@ -77,17 +86,13 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public Page<FileMetaData> searchFiles(String fileName, Date startDate, Date endDate, Pageable pageable) {
-        return fileRepo.findByfileNameContainingAndUploadDateBetween(fileName, startDate, endDate, pageable);
-        //        Criteria criteriaCount = session.createCriteria(FileMetaData.class);
-//        criteriaCount.setProjection(Projections.rowCount());
-//        Long count = (Long) criteriaCount.uniqueResult();
-//
-//        Criteria criteria = session.createCriteria(FileMetaData.class);
-//        criteria.setFirstResult(0);
-//        criteria.setMaxResults(2);
-//        List<FileMetaData> firstPage = criteria.list();
+    public Page<FileMetaData> searchFiles(String fileName, String owner, Date startDate, Date endDate, Pageable pageable) {
+        return fileRepo.findByFileNameContainingAndOwnerAndUploadDateBetween(fileName, owner.toUpperCase(), startDate, endDate,pageable);
+    }
 
+    @Override
+    public FileMetaData getMetaData(String fileId) {
+        return fileRepo.findOne(fileId);
     }
 
     private InputStream openFile(FileMetaData fileMetaData) throws FileNotFoundException {

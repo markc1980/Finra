@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface FileRepo extends CrudRepository<FileMetaData, String> {
 
-    Page<FileMetaData> findByfileNameContainingAndUploadDateBetween(String name, Date startDate, Date endDate, Pageable pageable);
 
+    Page<FileMetaData> findByFileNameContainingAndOwnerAndUploadDateBetween(String fileName, String owner, Date startDate, Date endDate, Pageable pageable);
+
+    List<FileMetaData> findByUploadDateAfter(Date time);
 }
