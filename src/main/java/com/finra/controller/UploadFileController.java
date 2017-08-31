@@ -1,6 +1,7 @@
 package com.finra.controller;
 
 import com.finra.dto.FileMetaDataDto;
+import com.finra.model.FileMetaData;
 import com.finra.service.FileService;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -9,12 +10,10 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,7 @@ public class UploadFileController {
     public void uploadFile(@RequestPart("file") MultipartFile multipartFile,
                            @RequestPart("fileMetaData")FileMetaDataDto fileMetaDataDto){
         try {
-            fileService.saveFile(fileMetaDataDto, multipartFile.getInputStream());
+            fileService.saveFileData(fileMetaDataDto, multipartFile);
         }catch(Exception e){
 
         }

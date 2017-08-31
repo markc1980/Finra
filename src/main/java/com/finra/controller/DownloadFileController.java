@@ -28,6 +28,6 @@ public class DownloadFileController {
     @GetMapping(value = "/downloadFile",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void download(OutputStream output, @PathVariable("fileId") String fileId) throws IOException {
-        fileService.downloadFile(fileId, output);
+        fileService.downloadFileData(fileId, output);
     }
 }

@@ -7,33 +7,31 @@ import java.util.Date;
  */
 public class FileMetaDataDto {
 
-    private String fileName;
+    private String owner;
 
-    private Date uploadDate;
+    private String permissions;
 
-    private String description;
-
-    public Date getUploadDate() {
-        return uploadDate;
+    public FileMetaDataDto() {
     }
 
-    public void setUploadDate(Date uploadDate) {
-        this.uploadDate = uploadDate;
+    public FileMetaDataDto(String owner, String permissions) {
+        this.owner = owner;
+        this.permissions = permissions;
     }
 
-    public String getDescription() {
-        return description;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getPermissions() {
+        return permissions;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
     }
 }

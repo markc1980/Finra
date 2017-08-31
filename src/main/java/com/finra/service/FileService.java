@@ -1,13 +1,11 @@
 package com.finra.service;
 
 import com.finra.dto.FileMetaDataDto;
-import com.finra.dto.SearchFileMetaDataRequestDto;
-import com.finra.dto.SearchFileMetaDataResponseDto;
 import com.finra.model.FileMetaData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
@@ -16,9 +14,9 @@ import java.util.Date;
  */
 public interface FileService {
 
-    String saveFile(FileMetaData fileMetaDataDto, InputStream is);
+    String saveFileData(FileMetaDataDto fileMetaDataDto, MultipartFile is);
 
-    void downloadFile(String fileId, OutputStream os);
+    void downloadFileData(String fileId, OutputStream os);
 
     Page<FileMetaData> searchFiles(String fileName, Date startDate, Date endDate, Pageable pageable);
 }

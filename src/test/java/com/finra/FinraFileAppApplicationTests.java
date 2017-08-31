@@ -1,5 +1,6 @@
 package com.finra;
 
+import com.finra.dto.FileMetaDataDto;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -38,12 +39,12 @@ public class FinraFileAppApplicationTests {
 
 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 		JSONObject jo = new JSONObject();
-		jo.put("fileName","FileXXX.txt");
-		jo.put("fileSize",23L);
+		jo.put("owner", "Mark Chin");
+		jo.put("permissions", "R");
 
 		builder.addTextBody("fileMetaData",jo.toString(), ContentType.APPLICATION_JSON);
-		builder.addBinaryBody("file", new File("/Users/markchin/Desktop/b1request.xml"),
-				ContentType.APPLICATION_OCTET_STREAM, "file.ext");
+		builder.addBinaryBody("file", new File("/Users/markchin/Desktop/insanity.avi"),
+				ContentType.APPLICATION_OCTET_STREAM, "insanity.ext");
 
 
 		ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {

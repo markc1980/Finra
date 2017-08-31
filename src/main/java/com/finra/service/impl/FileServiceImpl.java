@@ -1,17 +1,18 @@
 package com.finra.service.impl;
 
 import com.finra.dto.FileMetaDataDto;
-import com.finra.dto.SearchFileMetaDataRequestDto;
-import com.finra.dto.SearchFileMetaDataResponseDto;
 import com.finra.model.FileMetaData;
 import com.finra.repo.FileRepo;
 import com.finra.service.FileService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,18 +32,36 @@ public class FileServiceImpl implements FileService{
     @Autowired
     private FileRepo fileRepo;
 
+    @Value("${data.storage.location}")
+    private String fileLocation;
+
     @Override
-    public String saveFile(FileMetaData fileMetaData, InputStream is) {
-        IOUtils.copyLarge(is, new FileOutputStream(new File(fileMetaData.getFileName())));
-        fileRepo.save(fileMetaData);
-        return fileMetaData.getId();
+    public String saveFileData(FileMetaDataDto fileMetaDataDto, MultipartFile multipart) {
+        FileMetaData fileMetaData = null;
+        try {
+
+            IOUtils.copyLarge(multipart.getInputStream(), new FileOutputStream(
+                    new File(fileLocation, multipart.getOriginalFilename())));
+
+            String checksum = DigestUtils.md5Hex(multipart.getInputStream());
+            fileMetaData = new FileMetaData(
+                    multipart.getOriginalFilename(), multipart.getSize(),
+                    new java.sql.Date(new Date().getTime()),
+                    fileLocation, checksum );
+            fileRepo.save(fileMetaData);
+            return fileMetaData.getId();
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void downloadFile(String fileId, OutputStream os) {
+    public void downloadFileData(String fileId, OutputStream os) {
         FileMetaData fileMetaData = fileRepo.findOne(fileId);
         try(final InputStream myFile = openFile(fileMetaData)) {
             IOUtils.copy(myFile, os);
+        }catch(Exception e){
+            throw new RuntimeException(e);
         }
     }
 

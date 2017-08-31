@@ -37,8 +37,15 @@ public class FileMetaData {
     @Column(name="CHECK_SUM", nullable = false)
     private String checksum;
 
-    @Column(name="DESCRIPTION", nullable = true)
-    private String description;
+
+
+    public FileMetaData(String fileName, Long fileSize, Date uploadDate, String fileLocation, String checksum) {
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.uploadDate = uploadDate;
+        this.fileLocation = fileLocation;
+        this.checksum = checksum;
+    }
 
     public String getId() {
         return id;
@@ -88,11 +95,5 @@ public class FileMetaData {
         this.checksum = checksum;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
