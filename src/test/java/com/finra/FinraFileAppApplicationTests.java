@@ -1,7 +1,5 @@
 package com.finra;
 
-import com.finra.dto.FileMetaDataDto;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -20,25 +18,19 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.xml.bind.DatatypeConverter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
-
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class FinraFileAppApplicationTests {
 
-
+	private String fileToUpload = null;// update to some file location
 
 	@Test
 	public void upload()
 			throws ClientProtocolException, IOException, JSONException {
+		//SEE THE PROPERTY data.storage.location IN application.properties where file will be stored
 		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost("http://localhost:8080/uploadFile");
 
@@ -49,8 +41,8 @@ public class FinraFileAppApplicationTests {
 
 		builder.addTextBody("fileMetaData",jo.toString(), ContentType.APPLICATION_JSON);
 		//builder.addBinaryBody("file", new File("/Users/markchin/Desktop/b1request.xml"),
-		builder.addBinaryBody("file", new File("C:\\Users\\mchin\\ports.txt"),
-				ContentType.APPLICATION_OCTET_STREAM, "ports.txt");
+		builder.addBinaryBody("file", new File(fileToUpload),
+				ContentType.APPLICATION_OCTET_STREAM, "uploadedFile.txt");
 
 
 		ProgressHttpEntityWrapper.ProgressCallback progressCallback = new ProgressHttpEntityWrapper.ProgressCallback() {
@@ -71,18 +63,43 @@ public class FinraFileAppApplicationTests {
 		client.close();
 	}
 
+	/**
+	 * Test assumes file in location /data/text.tx
+	 *
+     */
 	@Test
-	public void download() throws IOException {
+	public void downloadFile() throws IOException {
 		CloseableHttpClient client = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet("http://localhost:8080/downloadFile");
+		HttpGet httpGet = new HttpGet("http://localhost:8080/downloadFile/ID123");
 		CloseableHttpResponse response = client.execute(httpGet);
 		InputStream is  = response.getEntity().getContent();
+		String text = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+		System.out.println("Download = "+text);
+	}
 
-		IOUtils.copy(is, new FileOutputStream(new File("myFile.txt")));
+	@Test
+	public void downloadMetaData() throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://localhost:8080/downloadFileMetaData/ID123");
+		CloseableHttpResponse response = client.execute(httpGet);
+		InputStream is  = response.getEntity().getContent();
+		String text = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+		System.out.println(" ************ Download MetaData = "+text);
 
 	}
 
+	@Test
+	public void searchFile() throws IOException {
+		CloseableHttpClient client = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("http://localhost:8080/searchFiles/file/owner/markc/startDate/2017-08-11/endDate/2017-11-11?page=0&size=2");
+		CloseableHttpResponse response = client.execute(httpGet);
+		InputStream is  = response.getEntity().getContent();
+		String text = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+		System.out.println(" ************ Search Results = "+text);
 
+	}
+
+//-----------------------------------------------------------------------
 	static class ProgressHttpEntityWrapper extends HttpEntityWrapper {
 
 		private final ProgressCallback progressCallback;
@@ -135,24 +152,5 @@ public class FinraFileAppApplicationTests {
 
 		}
 	}
-
-	@Test
-	public void testDigest() throws Exception{
-		byte[] buffer = new byte[8192];
-		FileInputStream fis = new FileInputStream(new File("C:\\Users\\mchin\\ports.txt"));
-//		String checksum = DigestUtils.md5Hex(fis);
-//		System.out.println("Digest = "+checksum);
-
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		DigestInputStream dis = new DigestInputStream(fis, md);
-		try {
-			byte buf[]=new byte[8 * 1024];
-			while (dis.read(buf,0,buf.length) > 0)     ;
-		} finally {
-			dis.close();
-		}
-		System.out.println("DatatypeConverter.printHexBinary(md.digest()) = "+ DatatypeConverter.printHexBinary(md.digest()));
-	}
-
 
 }

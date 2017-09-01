@@ -1,34 +1,28 @@
 package com.finra.controller;
 
-import com.finra.dto.SearchFileMetaDataRequestDto;
-import com.finra.dto.SearchFileMetaDataResponseDto;
 import com.finra.model.FileMetaData;
 import com.finra.service.FileService;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Projections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by mchin on 8/30/2017.
  */
 @RestController
 public class SearchFileController {
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
     private FileService fileService;
@@ -41,19 +35,22 @@ public class SearchFileController {
                                    Pageable pageable){
 
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate start = LocalDate.parse(startDateParam, formatter);
-        Instant instant = start.atStartOfDay().atZone(ZoneId.systemDefault())
-                .toInstant();
-        Date startDate = Date.from(instant);
-
-        LocalDate end = LocalDate.parse(endDateParam, formatter);
-         Instant einstant = end.atStartOfDay().atZone(ZoneId.systemDefault())
-                .toInstant();
-        Date endDate = Date.from(einstant);
-
+        Date startDate = getDate(startDateParam);
+        Date endDate = getDate(endDateParam);
 
         Page<FileMetaData> result =  fileService.searchFiles(fileName, owner, startDate, endDate, pageable);
         return result;
+    }
+
+    private Date getDate(@PathVariable("startDate") String date) {
+        try {
+            LocalDate start = LocalDate.parse(date, formatter);
+            Instant instant = start.atStartOfDay().atZone(ZoneId.systemDefault())
+                    .toInstant();
+
+            return Date.from(instant);
+        }catch(DateTimeParseException e){
+            throw new IllegalArgumentException("Invalid date "+date, e);
+        }
     }
 }

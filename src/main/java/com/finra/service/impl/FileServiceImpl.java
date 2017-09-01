@@ -11,15 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.sql.Timestamp;
@@ -33,6 +29,7 @@ import java.util.Date;
 public class FileServiceImpl implements FileService{
 
     private static final int EOF = -1;
+    private static final int BUFFER_SIZE = 1024 * 8;
     @Autowired
     private FileRepo fileRepo;
 
@@ -42,7 +39,7 @@ public class FileServiceImpl implements FileService{
     @Override
     public String saveFileData(FileMetaDataDto fileMetaDataDto, MultipartFile multipart) {
         try {
-            byte[] buffer = new byte[1024 * 8];
+            byte[] buffer = new byte[BUFFER_SIZE];
             final InputStream is = multipart.getInputStream();
             final OutputStream os = new FileOutputStream(
                     new File(fileLocation, multipart.getOriginalFilename()));
@@ -61,7 +58,6 @@ public class FileServiceImpl implements FileService{
             }
 
             final String checkSum = DatatypeConverter.printHexBinary(md.digest());
-            System.out.println("DatatypeConverter.printHexBinary(md.digest()) = "+ checkSum);
 
             FileMetaData fileMetaData = new FileMetaData(
                     multipart.getOriginalFilename(), multipart.getSize(),
@@ -71,7 +67,7 @@ public class FileServiceImpl implements FileService{
 
             return fileMetaData.getId();
         }catch(Exception e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error upoloading file", e);
         }
     }
 
@@ -81,12 +77,15 @@ public class FileServiceImpl implements FileService{
         try(final InputStream myFile = openFile(fileMetaData)) {
             IOUtils.copy(myFile, os);
         }catch(Exception e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error downloading file for file Id "+fileId, e);
         }
     }
 
     @Override
     public Page<FileMetaData> searchFiles(String fileName, String owner, Date startDate, Date endDate, Pageable pageable) {
+        if(StringUtils.isEmpty(fileName) || StringUtils.isEmpty(owner)){
+            throw new IllegalArgumentException("File Name and Owner must be present for search");
+        }
         return fileRepo.findByFileNameContainingAndOwnerAndUploadDateBetween(fileName, owner.toUpperCase(), startDate, endDate,pageable);
     }
 

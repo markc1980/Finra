@@ -1,5 +1,6 @@
 package com.finra.mail;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,10 @@ public class Mail {
 
     private List< Object > attachments;
 
-    private Map< String, Object > model;
+    private Map< String, Object > model = new HashMap<>();
 
     public Mail() {
-        contentType = "text/plain";
+        contentType = "text/html";
     }
     // getter and setter
 

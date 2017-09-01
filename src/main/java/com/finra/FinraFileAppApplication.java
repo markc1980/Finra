@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.MultipartFilter;
 
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.support.MultipartFilter;
 @EnableAutoConfiguration
 @EnableJpaRepositories
 @SpringBootApplication
+@EnableScheduling
 @ImportResource(value="classpath:/package/hsql_cnfg.xml")
 public class FinraFileAppApplication {
 

@@ -1,2 +1,6 @@
 insert into FILE_META_DATA (ID, FILE_NAME, FILE_SIZE, UPLOAD_DATE, FILE_LOCATION, OWNER, CHECK_SUM)
-values ('ID123', 'file.txt', 123, '2017-10-01 14:04:01','/Users/markchin/text.txt','MARKC', 'ASDS23340');
+values ('ID123', 'file.txt', 123, '2017-08-31 17:30:01','/data/text.txt','MARKC', 'ASDS23340');
+insert into FILE_META_DATA (ID, FILE_NAME, FILE_SIZE, UPLOAD_DATE, FILE_LOCATION, OWNER, CHECK_SUM)
+values ('ID124', 'file1.txt', 123, '2017-08-31 17:30:01','/data/text1.txt','MARKC', 'FGDFGDFG');
+insert into FILE_META_DATA (ID, FILE_NAME, FILE_SIZE, UPLOAD_DATE, FILE_LOCATION, OWNER, CHECK_SUM)
+values ('ID125', 'file2.txt', 123, '2017-08-31 17:30:01','/data/text2.txt','MARKC', 'FGDFGDFG');

@@ -5,6 +5,7 @@ import freemarker.template.Template;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import javax.mail.internet.MimeMessage;
@@ -12,6 +13,7 @@ import javax.mail.internet.MimeMessage;
 /**
  * Created by mchin on 8/31/2017.
  */
+@Service
 public class MailService {
 
     @Autowired

@@ -17,7 +17,7 @@ import java.util.Properties;
 public class EmailConfig {
 
     @Autowired
-    EmailProperties emailProperties;
+    private EmailProperties emailProperties;
 
 
     @Bean

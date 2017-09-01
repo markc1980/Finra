@@ -19,7 +19,6 @@ public class EmailProperties {
 
     @PostConstruct
     public void init(){
-        System.out.println("dfgfdggfd");
     }
 
     public void setHost(String host) {

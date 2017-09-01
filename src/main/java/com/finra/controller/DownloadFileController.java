@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -20,15 +19,15 @@ public class DownloadFileController {
     @Autowired
     private FileService fileService;
 
-    @GetMapping(value = "/downloadFile",
+    @GetMapping(value = "/downloadFile/{fileId}",
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public void download(OutputStream output, @PathVariable("fileId") String fileId) throws IOException {
+    public void download(OutputStream output, @PathVariable("fileId") String fileId) {
         fileService.downloadFileData(fileId, output);
     }
 
-    @GetMapping(value = "/downloadMetaData",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public FileMetaData download(@PathVariable("fileId") String fileId) throws IOException {
+    @GetMapping(value = "/downloadFileMetaData/{fileId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public FileMetaData download(@PathVariable("fileId") String fileId) {
         return fileService.getMetaData(fileId);
     }
 

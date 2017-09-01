@@ -2,11 +2,14 @@
 <head></head>
 
 <body>
-<p>Dear ${firstName} ${lastName},</p>
-<p>Sending Email using Spring Boot with <b>FreeMarker template !!!</b></p>
-<p>Thanks</p>
-<p>${signature}</p>
-<p>${location}</p>
+<table>
+    <th>File Name</th><th>File Owner</th><th>File Upload Date</th>
+    <#list files as file>
+        <tr>
+            <td>${file.fileName}</td><td>${file.owner}</td><td>${file.uploadDate}</td>
+        </tr>
+    </#list>
+</table>
 </body>
 
 </html>
